@@ -9,58 +9,44 @@ public enum Operation
 }
 public class OperationManager
 {
-    private int _first;
-    private int _second;
+    private readonly ExecutionManager ExecutionManager;
     public OperationManager(int first, int second)
     {
-        _first = first;
-        _second = second;
-    }
-    private int Sum()
-    {
-        return _first + _second;
-    }
-    private int Subtract()
-    {
-        return _first - _second;
-    }
-    private int Multiply()
-    {
-        return _first * _second;
+        ExecutionManager = new ExecutionManager();
+        ExecutionManager.PopulateFunctions(first, second);
+        ExecutionManager.PrepareExecution();
     }
     public int Execute(Operation operation)
     {
-        switch (operation)
-        {
-            case Operation.Sum:
-                return Sum();
-            case Operation.Subtract:
-                return Subtract();
-            case Operation.Multiply:
-                return Multiply();
-            default:
-                return -1; //just to simulate
-        }
+        return ExecutionManager.FuncExecute.GetValueOrDefault(operation)();
     }
 }
 
-//Implement functionality
 public class ExecutionManager
 {
     public Dictionary<Operation, Func<int>> FuncExecute { get; set; }
-    //Add delegates for sum, substrat and multiply here
+
+    private Func<int> Sum;
+    private Func<int> Subtract;
+    private Func<int> Multiply;
     public ExecutionManager()
     {
-
     }
 
-    public void PopulateFunctions(//pass delegates and register)
+    public void PopulateFunctions(int x, int y)
     {
-
+        Sum += () => x + y;
+        Subtract += () => x - y;
+        Multiply += () => x * y;
     }
     public void PrepareExecution()
     {
-        //fill dictionary here
+        FuncExecute = new Dictionary<Operation, Func<int>>()
+        {
+            { Operation.Sum, Sum },
+            { Operation.Subtract, Subtract },
+            { Operation.Multiply, Multiply }
+        };
     }
 }
 
